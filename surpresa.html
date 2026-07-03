@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coração</title>
+
+<style>
+body{
+    margin:0;
+    overflow:hidden;
+    background:black;
+}
+canvas{
+    display:block;
+}
+</style>
+</head>
+
+<body>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
+
+let w,h,cx,cy;
+
+function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+    cx = w/2;
+    cy = h/2;
+}
+window.addEventListener("resize", resize);
+resize();
+
+const text = "I LOVE YOU";
+
+// 🔥 mais pontos, mas ainda leve
+const TOTAL = 180;
+
+const points = [];
+
+// cria pontos mais distribuídos (mais bonito)
+for(let i=0;i<TOTAL;i++){
+    const t = (i/TOTAL) * Math.PI * 2;
+
+    points.push({
+        t,
+        phase: Math.random()*Math.PI*2,
+        offset: Math.random()*2
+    });
+}
+
+// equação do coração
+function heart(t){
+    return {
+        x:16*Math.pow(Math.sin(t),3),
+        y:-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))
+    };
+}
+
+function animate(time){
+
+    ctx.clearRect(0,0,w,h);
+
+    ctx.globalCompositeOperation = "lighter";
+
+    const scale = 14;
+
+    for(let i=0;i<TOTAL;i++){
+
+        const p = points[i];
+
+        const hrt = heart(p.t);
+
+        // 💓 pulsação suave geral
+        const pulse = 1 + Math.sin(time*0.002 + p.phase)*0.06;
+
+        const x = cx + hrt.x * scale * pulse;
+        const y = cy + hrt.y * scale * pulse;
+
+        // 💬 tamanho variando levemente
+        const size = 12 + (Math.sin(time*0.003 + p.phase)*2);
+
+        ctx.font = `bold ${size}px Arial`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        // ✨ neon mais bonito
+        ctx.shadowColor = "#ff4da6";
+        ctx.shadowBlur = 18;
+
+        // 💖 cor variando levemente
+        const glow = 150 + Math.sin(time*0.002 + p.phase)*80;
+
+        ctx.fillStyle = `rgb(255, ${80}, ${glow})`;
+
+        ctx.fillText(text, x, y);
+    }
+
+    requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+
+</body>
+</html>
